@@ -4,17 +4,13 @@
 <div class="container">
     <h2>Create Invoice</h2>
 
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
     @endif
 
@@ -23,15 +19,15 @@
 
         <div class="mb-3">
             <label>Name</label>
-            <input type="text" name="customer_name" class="form-control" required>
+            <input type="text" name="customer_name" class="form-control" required value="{{ old('customer_name') }}">
         </div>
         <div class="mb-3">
             <label>Email</label>
-            <input type="email" name="customer_email" class="form-control" required>
+            <input type="email" name="customer_email" class="form-control" required value="{{ old('customer_email') }}">
         </div>
         <div class="mb-3">
             <label>Address</label>
-            <textarea name="customer_address" class="form-control" required></textarea>
+            <textarea name="customer_address" class="form-control" required>{{ old('customer_address') }}</textarea>
         </div>
 
         <h5>Products</h5>
@@ -47,14 +43,23 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td><input type="text" name="product_name[]" class="form-control" required></td>
-                    <td><input type="number" name="quantity[]" class="form-control qty" required></td>
-                    <td><input type="number" step="0.01" name="price[]" class="form-control price" required></td>
-                    <td><input type="number" step="0.01" name="tax[]" class="form-control tax" required></td>
-                    <td><input type="number" step="0.01" class="form-control total" readonly></td>
-                    <td><button type="button" class="btn btn-sm btn-danger remove_row">−</button></td>
-                </tr>
+                @php
+                    $products = old('product_name', []) ?: [''];
+                    $quantities = old('quantity', []);
+                    $prices = old('price', []);
+                    $taxes = old('tax', []);
+                @endphp
+
+                @foreach ($products as $i => $product)
+                    <tr>
+                        <td><input type="text" name="product_name[]" class="form-control" value="{{ $product }}" required></td>
+                        <td><input type="number" name="quantity[]" class="form-control qty" value="{{ $quantities[$i] ?? '' }}" required></td>
+                        <td><input type="number" step="0.01" name="price[]" class="form-control price" value="{{ $prices[$i] ?? '' }}" required></td>
+                        <td><input type="number" step="0.01" name="tax[]" class="form-control tax" value="{{ $taxes[$i] ?? '' }}" required></td>
+                        <td><input type="number" step="0.01" class="form-control total" readonly></td>
+                        <td><button type="button" class="btn btn-sm btn-danger remove_row">−</button></td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
 

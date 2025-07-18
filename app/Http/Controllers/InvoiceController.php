@@ -24,14 +24,27 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'customer_name' => 'required',
-            'customer_email' => 'required|email',
-            'customer_address' => 'required',
-            'product_name.*' => 'required',
-            'quantity.*' => 'required|integer',
-            'price.*' => 'required|numeric',
-            'tax.*' => 'required|numeric',
+            'customer_name'      => 'required|string|max:255',
+            'customer_email'     => 'required|email',
+            'customer_address'   => 'required|string|max:1000',
+            'product_name'       => 'required|array|min:1',
+            'product_name.*'     => 'required|string|max:255',
+            'quantity'           => 'required|array|min:1',
+            'quantity.*'         => 'required|integer|min:1',
+            'price'              => 'required|array|min:1',
+            'price.*'            => 'required|numeric|min:1',
+            'tax'                => 'required|array|min:1',
+            'tax.*'              => 'required|numeric|min:0|max:100',
         ]);
+
+        if (
+            count($request->product_name) !== count($request->quantity) ||
+            count($request->product_name) !== count($request->price) ||
+            count($request->product_name) !== count($request->tax)
+        ) {
+            return back()->withErrors(['product_name' => 'Product details are not matched properly.'])->withInput();
+        }
+
 
         $subtotal = 0;
         $total = 0;
@@ -97,14 +110,26 @@ class InvoiceController extends Controller
     public function update(Request $request, Invoice $invoice)
     {
         $request->validate([
-            'customer_name' => 'required',
-            'customer_email' => 'required|email',
-            'customer_address' => 'required',
-            'product_name.*' => 'required',
-            'quantity.*' => 'required|integer',
-            'price.*' => 'required|numeric',
-            'tax.*' => 'required|numeric',
+            'customer_name'      => 'required|string|max:255',
+            'customer_email'     => 'required|email',
+            'customer_address'   => 'required|string|max:1000',
+            'product_name'       => 'required|array|min:1',
+            'product_name.*'     => 'required|string|max:255',
+            'quantity'           => 'required|array|min:1',
+            'quantity.*'         => 'required|integer|min:1',
+            'price'              => 'required|array|min:1',
+            'price.*'            => 'required|numeric|min:1',
+            'tax'                => 'required|array|min:1',
+            'tax.*'              => 'required|numeric|min:0|max:100',
         ]);
+
+        if (
+            count($request->product_name) !== count($request->quantity) ||
+            count($request->product_name) !== count($request->price) ||
+            count($request->product_name) !== count($request->tax)
+        ) {
+            return back()->withErrors(['product_name' => 'Product details are not matched properly.'])->withInput();
+        }
 
         $subtotal = 0;
         $total = 0;
